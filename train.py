@@ -17,7 +17,7 @@ max_epochs = 100
 batch_size = 8
 lr_init = 32 ** (-0.5)
 eval_steps = 50000
-weight_delay = 1e-7
+weight_decay = 1e-7
 batches_per_epoch = 40000
 
 # lr scheduling
@@ -36,8 +36,7 @@ early_stop = False
 
 # file path
 train_file_list_path = './train_file_list'
-#validation_file_list_path = './validation_file_list'
-validation_file_list_path= './train_file_list'
+validation_file_list_path = './validation_file_list'
 # data and data_loader
 train_data = TrainingDataset(train_file_list_path, frame_size=512, frame_shift=256)
 train_loader = DataLoader(train_data,
@@ -58,7 +57,7 @@ model = model.cuda()
 torchinfo.summary(model, input_size=(1, 1,16000*4))
 #print('Number of learnable parameters: %d' % numParams(model))
 
-optimizer = torch.optim.Adam(model.parameters(), lr=lr_init, weight_decay=weight_delay)
+optimizer = torch.optim.Adam(model.parameters(), lr=lr_init, weight_decay=weight_decay)
 
 time_loss = torch.nn.MSELoss()
 freq_loss = stftm_loss()
