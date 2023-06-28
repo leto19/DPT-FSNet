@@ -1,10 +1,11 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import torch
 import os
 import shutil
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 
 
@@ -75,5 +76,4 @@ def show_model(nnet):
     for module_name, m in nnet.named_modules():
         if module_name == '':
             print(m)
-    print("=" * 98)
-~                                                                                                                                                                                                                                                                                        
+    print("=" * 98)                                                                                                                                                                                                                                                                                    

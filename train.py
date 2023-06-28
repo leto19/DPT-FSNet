@@ -8,14 +8,14 @@ from utils import Checkpoint
 from tqdm import tqdm
 import os
 import warnings
-
+import torchinfo
 # hyperparameter
 frame_size = 512
 overlap = 0.5
 frame_shift = int(512 * (1 - overlap))
-max_epochs = 200
+max_epochs = 100
 batch_size = 8
-lr_init = 64 ** (-0.5)
+lr_init = 32 ** (-0.5)
 eval_steps = 50000
 weight_delay = 1e-7
 batches_per_epoch = 40000
@@ -36,8 +36,8 @@ early_stop = False
 
 # file path
 train_file_list_path = './train_file_list'
-validation_file_list_path = './validation_file_list'
-
+#validation_file_list_path = './validation_file_list'
+validation_file_list_path= './train_file_list'
 # data and data_loader
 train_data = TrainingDataset(train_file_list_path, frame_size=512, frame_shift=256)
 train_loader = DataLoader(train_data,
@@ -55,11 +55,12 @@ validation_loader = DataLoader(validation_data,
 model = Net()
 model = torch.nn.DataParallel(model)
 model = model.cuda()
-print('Number of learnable parameters: %d' % numParams(model))
+torchinfo.summary(model, input_size=(1, 1,16000*4))
+#print('Number of learnable parameters: %d' % numParams(model))
 
 optimizer = torch.optim.Adam(model.parameters(), lr=lr_init, weight_decay=weight_delay)
 
-mag_loss = mag_loss()
+time_loss = torch.nn.MSELoss()
 freq_loss = stftm_loss()
 
 def validate(net, eval_loader, test_metric=False):
@@ -165,12 +166,13 @@ for epoch in range(start_epoch, max_epochs):
 
 
         #loss_time = model.module.loss(output, labels, loss_mode='SI-SNR')
-        loss_mag = mag_loss(output, labels)   
-        loss_freq = freq_loss(output, labels, loss_mask)
-        loss =  loss_mag +loss_freq #+ 0.05 * loss_time
+        #print(output.shape, labels.shape)
+        loss_freq = freq_loss(output, labels)
+        loss_time = time_loss(output, labels)   
+        loss =  0.6*loss_freq +0.4* loss_time
 
 
-        ref_loss = model.module.loss(output, labels, loss_mode='SI-SNR')        
+        #ref_loss = model.module.loss(output, labels, loss_mode='SI-SNR')        
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5)
 
@@ -184,9 +186,9 @@ for epoch in range(start_epoch, max_epochs):
 
         #del loss, output, features, labels
 
-        del loss, loss_mag, loss_freq, output, features, labels
+        del loss, loss_time, loss_freq, output, features, labels
 
-        pbar.set_description('iter = {}/{}, epoch = {}/{}, loss = {:.5f}, ref_loss = {:.5f}, lr = {:.6f}'.format(index + 1, len(train_loader), epoch + 1, max_epochs, train_loss, ref_loss,lr))
+        pbar.set_description('iter = {}/{}, epoch = {}/{}, loss = {:.5f},  lr = {:.6f}'.format(index + 1, len(train_loader), epoch + 1, max_epochs, train_loss,lr))
 
         if (index + 1) % eval_steps == 0:
             ave_train_loss = total_train_loss / count

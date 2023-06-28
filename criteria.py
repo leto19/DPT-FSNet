@@ -4,9 +4,9 @@ from conv_stft import ConvSTFT
 
 class stftm_loss(object):
     def __init__(self, frame_size=512, frame_shift=256, loss_type='mae'):
-        self.stft =  ConvSTFT(frame_size, frame_shift, frame_size, 'hanning', 'complex', fix=True).cuda()
+        self.stft =  ConvSTFT(frame_size, frame_shift, frame_size, 'hann', 'complex', fix=True).cuda()
         self.fft_len = 512
-
+        self.loss_type = loss_type
 
     def __call__(self, outputs, labels):
         out_real, out_imag = self.get_stftm(outputs)
@@ -37,8 +37,9 @@ class stftm_loss(object):
 
 class mag_loss(object):
     def __init__(self, frame_size=512, frame_shift=256, loss_type='mae'):
-        self.stft =  ConvSTFT(frame_size, frame_shift, frame_size, 'hanning', 'complex', fix=True).cuda()
+        self.stft =  ConvSTFT(frame_size, frame_shift, frame_size, 'hann', 'complex', fix=True).cuda()
         self.fft_len = 512
+        self.loss_type = loss_type
 
     def __call__(self, outputs, labels):
         out_mags = self.get_mag(outputs)

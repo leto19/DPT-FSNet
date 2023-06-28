@@ -211,11 +211,10 @@ class Net(nn.Module):
         self.dec_dense1 = DenseBlock(256, 4, self.width)
 
         self.out_conv = nn.Conv2d(in_channels=self.width, out_channels=self.out_channels, kernel_size=(1, 1))
-        self.stft =  ConvSTFT(self.L, self.frame_shift, self.L, 'hanning', 'real', fix=True)
-        self.istft = ConviSTFT(self.L, self.frame_shift, self.L, 'hanning', 'complex', fix=True)
+        self.stft =  ConvSTFT(self.L, self.frame_shift, self.L, 'hann', 'real', fix=True)
+        self.istft = ConviSTFT(self.L, self.frame_shift, self.L, 'hann', 'complex', fix=True)
 
-        show_model(self)
-        show_params(self)
+        
 
     def forward(self, x, masking_mode='C'):
 
