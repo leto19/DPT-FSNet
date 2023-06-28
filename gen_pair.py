@@ -8,8 +8,8 @@ import time
 
 def gen_pair():
 
-    train_clean_path = '/isilon/backup_netapp/dangfeng/VCTK_DEMAND/clean_trainset_28spk_wav_16k'
-    train_noisy_path = '/isilon/backup_netapp/dangfeng/VCTK_DEMAND/noisy_trainset_28spk_wav_16k'
+    train_clean_path = '/mnt/parscratch/users/acp20glc/VoiceBank/clean_trainset_28spk_wav_16k'
+    train_noisy_path = '/mnt/parscratch/users/acp20glc/VoiceBank/noisy_trainset_28spk_wav_16k'
     train_mix_path = './dataset/voice_bank_mix/trainset'
 
     train_clean_name = sorted(os.listdir(train_clean_path))
